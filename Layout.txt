@@ -1,0 +1,25 @@
+Layout:
+
+Init symbol.
+- Create a new folder to store data.
+- Fetch raw prices for default price range and save to folder.
+- Parse JSON to an object for the symbol.
+
+SMA, EMA, RSI, etc can be added as attributes to the symbol.
+- Button to track and notify about attributes
+
+Analyze past data to find potential:
+Support
+Resistance
+RSI Indicators
+
+py2app tutorial:
+https://www.metachris.com/2015/11/create-standalone-mac-os-x-applications-with-python-and-py2app/
+
+urllib.parse urlencode for building url?
+
+TODO:
+- Change alerts from Booleans to objects which have:
+    - Comparison operators
+    -
+  And if they are in the alerts array, then they are active. 
