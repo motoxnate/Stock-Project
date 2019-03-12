@@ -22,4 +22,4 @@ TODO:
 - Change alerts from Booleans to objects which have:
     - Comparison operators
     -
-  And if they are in the alerts array, then they are active. 
+  And if they are in the alerts array, then they are active.

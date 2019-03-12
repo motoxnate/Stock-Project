@@ -65,9 +65,9 @@ class AlertDaemon(threading.Thread):            #Sends alerts VIA pushsafer
             print("Alert Daemon Running")
             ind = 0
 
-            for i in self.parent.alerts:
-                if i is True:
-                    if self.last[i]
+            # for i in self.parent.alerts:
+            #     if i is True:
+            #         if self.last[i]
 
             for i in self.parent.alerts:
                 # print(self.parent.alerts[i], self.last[i])
