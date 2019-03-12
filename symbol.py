@@ -22,15 +22,16 @@ class Symbol():
         self.symb = symb
         self.end = False
 
+        self.current_rsi = -1
+        self.rsi = {}
+
         self.updateRSI('60min', '14', 'close')
+        print(self.rsi)
         # self.updateEMA('daily', '20', 'close')
 
-        self.indicators = {'overbought': 80, 'oversold': 20, 'rsi_low': 30, 'rsi_high': 70}
-        self.alerts = {'overbought': False, 'oversold': False, 'rsi_low': False, 'rsi_high': False}
+        self.indicators = {'Overbought': 80, 'rsiHigh': 70, 'rsiLow': 30, 'Oversold': 20}
         self.monitors = {}
-
-        # print(self.RSI)
-        # print(self.EMA)
+        self.alerts = {}
 
     def get(self, url):                                         #Downloads the JSON from a given url
         # self.threadValue = None                                 #None until first get completes
@@ -61,10 +62,11 @@ class Symbol():
         key = 'RSI: ' + ', '.join((interval, time_period, series_type))
         rsi = RSI_URL(self.symb, interval, time_period, series_type)
         rsi = self.get(rsi.build())
+
         try:
-            self.RSI[key] = rsi
+            self.rsi[key] = rsi
         except:
-            self.RSI = {key: rsi}   #New dict entry for RSI
+            self.rsi = {key: rsi}   #New dict entry for RSI
         with open(logfile, 'a') as f:
             f.write("Finished RSI update in " + str(time.time()-t) +'\n')
         f.closed
