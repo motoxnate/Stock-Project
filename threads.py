@@ -4,6 +4,7 @@ from urllib.request import Request, urlopen
 import time
 from alerts import *
 
+
 class Fetch(threading.Thread):
     def __init__(self, threadID, url, parent):
         threading.Thread.__init__(self, daemon=True)
@@ -16,6 +17,7 @@ class Fetch(threading.Thread):
         if self.parent.threadValue is None:
             self.parent.threadValue = data
 
+
 class RSIMonitor(threading.Thread):
     def __init__(self, parent, interval, time_period, series_type, alert_interval):
         threading.Thread.__init__(self, name='RSIMonitor'+ ', '.join((interval, time_period, series_type)), daemon=True)
@@ -27,13 +29,13 @@ class RSIMonitor(threading.Thread):
         self.alert_interval = alert_interval
         self.alert = None
 
-    def run(self):          #Check if RSI is within predefined bounds and update RSI
+    def run(self):          # Check if RSI is within predefined bounds and update RSI
         try:
             while self.parent.end is False:
                 current_rsi = float(self.parent.rsi['RSI: '+ ', '.join((self.interval, self.time_period, self.series_type))]['Technical Analysis: RSI'][next(iter(self.parent.rsi['RSI: '+ ', '.join((self.interval, self.time_period, self.series_type))]['Technical Analysis: RSI']))]['RSI'])
                 print("Monitoring RSI\n")
 
-                #Set Alert Status
+                # Set Alert Status
                 if current_rsi >= self.parent.indicators['Overbought']:
                     self.alert = Overbought(self.parent.indicators['Overbought'])
                 elif current_rsi >= self.parent.indicators['rsiHigh']:
@@ -45,19 +47,19 @@ class RSIMonitor(threading.Thread):
                 else:
                     self.alert = Oversold(self.parent.indicators['Oversold'])
 
-                #Write current rsi and alert status back to parent
+                # Write current rsi and alert status back to parent
                 self.parent.current_rsi = current_rsi
                 self.parent.alerts[self.name] = self.alert
-                print(current_rsi)
 
                 self.parent.updateRSI(self.time_period, self.interval, self.series_type)
-                time.sleep(float(self.alert_interval))   #In seconds
-        except KeyError:        #If update fails try again
+                time.sleep(float(self.alert_interval))   # In seconds
+        except KeyError:        # If update fails try again
             print('Waiting on RSI Update')
             time.sleep(0.5)
             self.run()
 
-class AlertDaemon(threading.Thread):            #Sends alerts VIA pushsafer
+
+class AlertDaemon(threading.Thread):            # Sends alerts VIA pushsafer
     def __init__(self, parent, alert_interval=30):
         print("Start Alert Daemon")
         threading.Thread.__init__(self, name='AlertDaemon', daemon=True)
@@ -81,26 +83,26 @@ class AlertDaemon(threading.Thread):            #Sends alerts VIA pushsafer
                     print(i, self.parent.alerts[i])
                     if i == 'Overbought':
                         icon = '48'
-                        iconColor = 'red'
+                        iconcolor = 'red'
                     if i == 'Oversold':
                         icon = '49'
-                        iconColor = 'red'
+                        iconcolor = 'red'
                     if i == 'rsiLow':
                         icon = '46'
-                        iconColor = 'orange'
+                        iconcolor = 'orange'
                     if i == 'rsiHigh':
                         icon = '47'
-                        iconColor = 'orange'
+                        iconcolor = 'orange'
 
-                    self.parent.notify('Stock Indicator Alert',     #Title
-                            ' '.join((self.parent.symb, i)),            #Message
-                            '',                         #Sound
-                            '',                         #Vibration
-                            icon,                       #Icon
-                            iconColor,                      #Iconcolor
-                            'a',                        #Device
-                            '',                         #URL
-                            '')                         #URLTitle
+                    self.parent.notify('Stock Indicator Alert',     # Title
+                            ' '.join((self.parent.symb, i)),            # Message
+                            '',                         # Sound
+                            '',                         # Vibration
+                            icon,                       # Icon
+                            iconcolor,                  # Iconcolor
+                            'a',                        # Device
+                            '',                         # URL
+                            '')                         # URLTitle
 
                 self.last[ind] = self.parent.alerts[i]
                 ind += 1

@@ -6,11 +6,13 @@ from urllib.request import Request, urlopen
 from urllib.parse import urlencode
 from url import *
 from threads import *
+from setup import *
 
-with open('pushsafer.key') as f:       #Load the API Key
-    pushsafer_key = f.read()
-    pushsafer_key = pushsafer_key.strip('\n')
-f.closed
+# with open('pushsafer.key') as f:       # Load the API Key
+#     pushsafer_key = f.read()
+#     pushsafer_key = pushsafer_key.strip('\n')
+# f.closed
+pushsafer_key = loadApiKey()
 
 logfile = 'logs/'+str(time.strftime('%Y-%m-%dT%H-%M-%S'))+'.log'
 with open(logfile, 'w') as f:
@@ -33,8 +35,8 @@ class Symbol():
         self.monitors = {}
         self.alerts = {}
 
-    def get(self, url):                                         #Downloads the JSON from a given url
-        # self.threadValue = None                                 #None until first get completes
+    def get(self, url):                                         # Downloads the JSON from a given url
+        # self.threadValue = None                                 # None until first get completes
         # threads = []
         # t = time.clock()
         # for i in range(20):
@@ -45,8 +47,8 @@ class Symbol():
         #     time.sleep(0.01)
         # print("Fetch took", time.clock()-t)
 
-        self.threadValue = http.client.HTTPResponse.read(urlopen(url))           #Faster option, but less reliable.
-        data = json.loads(self.threadValue.decode('utf-8'))                      #Load JSON string as a dictionary
+        self.threadValue = http.client.HTTPResponse.read(urlopen(url))           # Faster option, but less reliable.
+        data = json.loads(self.threadValue.decode('utf-8'))                      # Load JSON string as a dictionary
         return data
 
     def updateIntraday(self, interval, outputsize='compact'):
@@ -65,11 +67,12 @@ class Symbol():
 
         try:
             self.rsi[key] = rsi
-        except:
-            self.rsi = {key: rsi}   #New dict entry for RSI
+        except KeyError:
+            self.rsi = {key: rsi}   # New dict entry for RSI
         with open(logfile, 'a') as f:
             f.write("Finished RSI update in " + str(time.time()-t) +'\n')
-        f.closed
+        if not f.closed:
+            f.close()
 
     def updateEMA(self, interval, time_period, series_type):
         t = time.time()
@@ -78,11 +81,12 @@ class Symbol():
         EMA = self.get(EMA.build())
         try:
             self.EMA[key] = EMA
-        except:
-            self.EMA = {key: EMA}   #New dict entry for EMA
+        except KeyError:
+            self.EMA = {key: EMA}   # New dict entry for EMA
         with open(logfile, 'a') as f:
             f.write("Finished EMA update in " + str(time.time()-t) +'\n')
-        f.closed
+        if not f.closed:
+            f.close()
 
     def updateSMA(self, interval, time_period, series_type):
         t = time.time()
@@ -91,11 +95,12 @@ class Symbol():
         SMA = self.get(SMA.build())
         try:
             self.SMA[key] = SMA
-        except:
-            self.SMA = {key: SMA}   #New dict entry for SMA
+        except KeyError:
+            self.SMA = {key: SMA}   # New dict entry for SMA
         with open(logfile, 'a') as f:
             f.write("Finished SMA update in " + str(time.time()-t) +'\n')
-        f.closed
+        if not f.closed:
+            f.clsoe()
 
     def seriesLength(self, short, long):
         return(min(len(short), len(long)))
@@ -232,12 +237,11 @@ class Symbol():
         rsi = rsi[:seriesLength]
         print(seriesLength)
 
-
-    def setSupport(self, support):  #User input support
+    def setSupport(self, support):  # User input support
         self.support = support
         return None
 
-    def setResistance(self, resistance):    #User input resistance
+    def setResistance(self, resistance):    # User input resistance
         self.resistance = resistance
         return None
 
@@ -254,17 +258,17 @@ class Symbol():
     def notify(title, message, sound, vibration, icon, iconcolor, device, url, urltitle, private_key = pushsafer_key):
         url = 'https://www.pushsafer.com/api' # Set destination URL here
         post_fields = {                       # Set POST fields here
-    	"t" : title,
-    	"m" : message,
-    	"s" : sound,
-    	"v" : vibration,
-    	"i" : icon,
-    	"c" : iconcolor,
-    	"d" : device,
-    	"u" : url,
-    	"ut" : urltitle,
-    	"k" : private_key
-    	}
+            "t" : title,
+            "m" : message,
+            "s" : sound,
+            "v" : vibration,
+            "i" : icon,
+            "c" : iconcolor,
+            "d" : device,
+            "u" : url,
+            "ut" : urltitle,
+            "k" : private_key
+        }
 
         request = Request(url, urlencode(post_fields).encode())
         print(urlencode(post_fields))

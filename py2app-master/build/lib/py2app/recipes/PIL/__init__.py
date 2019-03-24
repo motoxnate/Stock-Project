@@ -4,7 +4,7 @@ import os, sys, glob
 try:
     from cStringIO import StringIO
 except ImportError:
-    from io import StringIO
+    from setup import StringIO
 
 try:
     set

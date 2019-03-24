@@ -1,6 +1,9 @@
-with open('alphavantage.key') as f:       #Load the API Key
-    alphavantage_key = f.read()
-f.closed
+from setup import *
+
+alphavantage_key = loadAlphavantageKey()
+# with open('alphavantage.key') as f:       #Load the API Key
+#     alphavantage_key = f.read()
+# f.closed
 
 class URL:
     def __init__(self, symbol, interval, apikey=alphavantage_key):

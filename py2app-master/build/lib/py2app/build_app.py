@@ -23,7 +23,7 @@ from py2app.util import mergecopy, make_exec
 try:
     from cStringIO import StringIO
 except ImportError:
-    from io import StringIO
+    from setup import StringIO
 
 from itertools import chain
 
