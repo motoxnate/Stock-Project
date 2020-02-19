@@ -32,6 +32,7 @@ class RSIMonitor(threading.Thread):
     def run(self):          # Check if RSI is within predefined bounds and update RSI
         try:
             while self.parent.end is False:
+                # Fetch Current RSI
                 current_rsi = float(self.parent.rsi['RSI: '+ ', '.join((self.interval, self.time_period, self.series_type))]['Technical Analysis: RSI'][next(iter(self.parent.rsi['RSI: '+ ', '.join((self.interval, self.time_period, self.series_type))]['Technical Analysis: RSI']))]['RSI'])
                 print("Monitoring RSI\n")
 
@@ -51,6 +52,7 @@ class RSIMonitor(threading.Thread):
                 self.parent.current_rsi = current_rsi
                 self.parent.alerts[self.name] = self.alert
 
+                # Call RSI Update and wait for the alert interval
                 self.parent.updateRSI(self.time_period, self.interval, self.series_type)
                 time.sleep(float(self.alert_interval))   # In seconds
         except KeyError:        # If update fails try again
@@ -70,7 +72,7 @@ class AlertDaemon(threading.Thread):            # Sends alerts VIA pushsafer
 
     def run(self):
         while self.parent.end is False:
-            print("Alert Daemon Running")
+            print("Alert Daemon Running " + str(time.strftime('%Y-%m-%dT%H-%M-%S')))
             ind = 0
 
             # for i in self.parent.alerts:
@@ -81,18 +83,18 @@ class AlertDaemon(threading.Thread):            # Sends alerts VIA pushsafer
                 # print(self.parent.alerts[i], self.last[i])
                 if self.parent.alerts[i] != self.last[ind] and self.parent.alerts[i] is True:
                     print(i, self.parent.alerts[i])
-                    if i == 'Overbought':
+                    if isinstance(i, Overbought):
                         icon = '48'
                         iconcolor = 'red'
-                    if i == 'Oversold':
-                        icon = '49'
-                        iconcolor = 'red'
-                    if i == 'rsiLow':
-                        icon = '46'
-                        iconcolor = 'orange'
-                    if i == 'rsiHigh':
+                    if isinstance(i, RsiHigh):
                         icon = '47'
                         iconcolor = 'orange'
+                    if isinstance(i, RsiLow):
+                        icon = '46'
+                        iconcolor = 'orange'
+                    if isinstance(i, Oversold):
+                        icon = '49'
+                        iconcolor = 'red'
 
                     self.parent.notify('Stock Indicator Alert',     # Title
                             ' '.join((self.parent.symb, i)),            # Message
@@ -107,3 +109,4 @@ class AlertDaemon(threading.Thread):            # Sends alerts VIA pushsafer
                 self.last[ind] = self.parent.alerts[i]
                 ind += 1
             time.sleep(1)
+        time.sleep(self.alert_interval)

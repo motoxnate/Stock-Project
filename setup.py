@@ -28,3 +28,6 @@ def startLog():
     if not f.closed:
         f.close()
     return log
+
+
+

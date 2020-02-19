@@ -1,21 +1,34 @@
 import os
 import time
+import atexit
 from symbol import *
 from setup import *
 
-
+def onExit():
+    for i in symbols:
+        symbols[i].end = True
+    time.sleep(1)
 # ----Setup---- #
-# Load API Key
+# Load API Key and begin Log
 pushsafer_key = loadApiKey()
-# Begin Logfile
 logfile = startLog()
+atexit.register(onExit)
+symbols = {}
 
-
-test = Symbol('AMD')
+symbols['AMD'] = Symbol('AMD')
 # test.analyzeRSI()
-test.beginRSIMonitor('60min', '14', 'close')
+symbols['AMD'].beginRSIMonitor('60min', '14', 'close')
+symbols['AMD'].beginAlertDaemon()
+
+symbols['NVDA'] = Symbol('NVDA')
+symbols['NVDA'].beginRSIMonitor('60min', '14', 'close')
+symbols['NVDA'].beginAlertDaemon()
+
+while(True):
+    time.sleep(10)
 
 print()
+
 
 # test.beginAlertDaemon()
 
